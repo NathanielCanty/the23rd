@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>23 Things I Like About You</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        /* General body and container styling */
+        body {
+            background-color: #ffc0cb;
+            font-family: 'Arial', sans-serif;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* New back button styling */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 2rem;
+            color: #d10000;
+            cursor: pointer;
+            z-index: 20;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 50px; /* Use 'gap' for even vertical spacing */
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+            padding-bottom: 50px;
+        }
+
+        h1 {
+            font-family: 'Pacifico', cursive;
+            font-size: 3rem;
+            white-space: nowrap;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            color: #d10000;
+            /* Removed margin-bottom */
+        }
+        
+        /* The container for the jar image and hearts */
+        .jar-container {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            background-image: url('../imgs/jar.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Removed margin */
+        }
+
+        .hearts-wrapper {
+            position: absolute;
+            width: 60%; 
+            height: 50%;
+            top: 40%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+            gap: 10px;
+            z-index: 1;
+        }
+
+        .heart {
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+            color: #d10000;
+        }
+
+        .heart:hover {
+            transform: scale(1.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            font-weight: bold;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            color: #9f175b;
+            max-width: 400px;
+            transform: scale(0.8);
+            animation: modal-in 0.3s forwards;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        @keyframes modal-in {
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .modal-text {
+            font-size: 1.2rem;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Refill button styling */
+        .refill-btn {
+            background-color: #d10000;
+            color: #ffffff;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            /* Removed negative margin */
+        }
+
+        .refill-btn:hover {
+            background-color: #ff5e5e;
+        }
+
+        /* Floating hearts animation */
+        .floating-heart {
+            position: absolute;
+            color: #ff69b4;
+            animation: float 10s ease-in-out infinite;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0);
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-500px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="javascript:history.back()" class="back-btn" aria-label="Go back to the previous page">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+    <div class="main-container">
+        <h1>23rd, 23 things I like about you</h1>
+        
+        <div class="jar-container">
+            <div class="hearts-wrapper">
+            </div>
+        </div>
+
+        <button class="refill-btn">Refill Jar</button>
+    </div>
+
+    <div id="love-note-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <p id="modal-note-text" class="modal-text"></p>
+        </div>
+    </div>
+
+    <audio id="popSound" src="../audios/pop-sound.mp3" preload="auto"></audio>
+    <script>
+        const reasons = [
+            "I love seeing you smile, and I love it even more when I'm the one making you smile.",
+            "Also you have great tits.",
+            "Its so fun listening to you rave about the things you're passionate about, its adorable.",
+            "You're the most awesome person I know.",
+            "You look hotter in a ponytail.",
+            "I feel very much ease in just being myself when I'm with you.",
+            "I think you like me too just saying",
+            "I enjoy your company more than anyone else's.",
+            "I really appreciate you agreeing to the idea that you should come here and my bed is better and more spacious, Thank you.",
+            "You have a really hot personality, like a 100 times better than anyone else, its obvious you worked on yourself and I love you for that, it makes you even more perfect than you already are.",
+            "Its very fun to bully you.",
+            "Your eye color smh is really complicated its fascinating.",
+            "I love that we can be a weirdo-silly couple together.",
+            "I love how much effort and consideration you put into every relationship with every person you have, despite them being a lil mean.",
+            "But I shall also assassin whoever is mean to you smh",
+            "I think you've a cute ass.",
+            "I love the way you make me feel.",
+            "I'm so proud of you as a great human, you said you didn't much care about morales and shit but it just meant that you don't need to be told whats wrong and what isn't. You are one of the most moral people I know.",
+            "Its so fascinating to be able to discuss complex issues and things so easily without having to end up arguing.",
+            "I have an air conditioner too now, be here.",
+            "Thank you for always listening to me even when you necessarily didn't agree with whatever I'm saying.",
+            "You have the most beautiful smile, its pretty as fuck fr.",
+            "You are simply the best part of my day, everyday."
+        ];
+
+        const jarWrapper = document.querySelector('.hearts-wrapper');
+        const modal = document.getElementById('love-note-modal');
+        const modalText = document.getElementById('modal-note-text');
+        const closeModalBtn = document.querySelector('.close-button');
+        const refillBtn = document.querySelector('.refill-btn');
+        let usedIndices = new Set();
+        const numHearts = 23;
+
+        // Function to create a heart element
+        function createHeart() {
+            const heart = document.createElement('i');
+            heart.classList.add('fas', 'fa-heart', 'heart');
+            return heart;
+        }
+
+        // Function to populate the jar with hearts
+        function populateJar() {
+            jarWrapper.innerHTML = '';
+            usedIndices.clear();
+            for (let i = 0; i < numHearts; i++) {
+                const heart = createHeart();
+                heart.dataset.index = i;
+                jarWrapper.appendChild(heart);
+            }
+        }
+
+        // Function to create a floating heart
+        function createFloatingHeart() {
+            const heart = document.createElement('i');
+            heart.classList.add('fas', 'fa-heart', 'floating-heart');
+            heart.style.left = `${Math.random() * 100}vw`;
+            heart.style.fontSize = `${Math.random() * 2 + 1}rem`;
+            heart.style.animationDuration = `${Math.random() * 5 + 5}s`;
+            heart.style.animationDelay = `-${Math.random() * 5}s`;
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 10000);
+        }
+
+        // Generate floating hearts
+        function generateFloatingHearts() {
+            setInterval(createFloatingHeart, 500);
+        }
+
+        // Get the audio element
+        const popSound = document.getElementById('popSound');
+
+        // Handle heart click
+        jarWrapper.addEventListener('click', (e) => {
+            if (e.target.classList.contains('heart')) {
+                const heart = e.target;
+                const index = heart.dataset.index;
+
+                if (!usedIndices.has(index)) {
+                    modalText.textContent = reasons[index];
+                    modal.style.display = 'flex';
+                    usedIndices.add(index);
+                    heart.style.opacity = '0.3';
+                    heart.style.pointerEvents = 'none';
+
+                    // Play the sound
+                    popSound.currentTime = 0; // Rewind the sound to the start
+                    popSound.play();
+                }
+            }
+        });
+
+        // Handle modal close
+        closeModalBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        // Handle refill button
+        refillBtn.addEventListener('click', () => {
+            populateJar();
+        });
+
+        // Initial setup
+        document.addEventListener('DOMContentLoaded', () => {
+            populateJar();
+            generateFloatingHearts();
+        });
+    </script>
+</body>
+</html>

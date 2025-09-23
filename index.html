@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #111;
+            color: #fff;
+            margin: 0;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        #timer {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #00ffcc;
+            letter-spacing: 2px;
+        }
+        h4 {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #aaa;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome !</h1>
+    <div id="timer">Loading...</div>
+    <h4>Left till your birthday!! :D</h4>
+
+    <!-- Confetti canvas -->
+    <canvas id="confetti"></canvas>
+
+    <!-- ✅ Include confetti library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <script>
+        // Target date in Australian Eastern Standard Time (AEST, UTC+10)
+        const targetDate = new Date("2025-09-24T00:00:00+10:00").getTime();
+
+        function updateTimer() {
+            const now = new Date().getTime();
+            const diff = targetDate - now;
+
+            if (diff <= 0) {
+                // Show final message
+                document.getElementById("timer").innerHTML = "🎉 It's time! 🎉";
+
+                // Confetti for 5 seconds
+                let end = Date.now() + 5000;
+                (function frame() {
+                    confetti({
+                        particleCount: 7,
+                        spread: 60,
+                        origin: { y: 0.7 }
+                    });
+                    if (Date.now() < end) {
+                        requestAnimationFrame(frame);
+                    }
+                })();
+
+                // Redirect after 5 seconds
+                setTimeout(() => {
+                    window.location.href = "second.html";
+                }, 5000);
+
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            const milliseconds = diff % 1000;
+
+            document.getElementById("timer").innerHTML =
+                `${days} : ${hours.toString().padStart(2, '0')} : ${minutes.toString().padStart(2, '0')} : ${seconds.toString().padStart(2, '0')} : ${milliseconds.toString().padStart(3, '0')}`;
+        }
+
+        // Update every 50 ms for smooth milliseconds
+        setInterval(updateTimer, 50);
+        updateTimer();
+    </script>
+</body>
+</html>

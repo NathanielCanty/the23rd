@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday</title>
+
+<link href="https://fonts.googleapis.com/css?family=Anonymous+Pro" rel="stylesheet">
+
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: rgb(25,25,25);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        font-family: 'Anonymous Pro', monospace;
+        color: rgba(255,255,255,.75);
+    }
+
+    /* Sticker / Animation */
+    #sticker {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 300px;
+        transition: opacity 2s ease;
+        z-index: 1;
+    }
+
+    /* Paragraph Container */
+    #message-container {
+        position: absolute;
+        width: 80%;
+        max-width: 800px;
+        height: auto;
+        max-height: 80vh;
+        opacity: 0;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center; 
+    }
+
+    /* Typewriter Paragraph */
+    #message-text {
+        font-size: 1.5vw;
+        text-align: justify;
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+        width: 100%;
+        border-right: 2px solid rgba(255,255,255,0.75);
+    }
+
+    /* Mute Button */
+    #mute-button-container {
+        position: fixed;
+        bottom: 15px;
+        left: 15px;
+        z-index: 3;
+    }
+
+    #mute-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #mute-icon {
+        width: 20px;
+        height: 20px;
+    }
+    
+    #next-button-container {
+    position: relative; 
+    margin-top: 40px;   /* space above the button */
+    margin-bottom: 40px; /* space below the button */
+    display: flex;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    z-index: 4;
+    }
+
+    
+    #next-button {
+        padding: 15px 30px;
+        font-size: 1.2em;
+        font-family: 'Anonymous Pro', monospace;
+        color: white;
+        background: transparent;
+        border: 2px solid rgba(255, 255, 255, 0.75);
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+    }
+    
+    #next-button:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+</style>
+</head>
+<body>
+    <img id="sticker" src="imgs/Dance-Dancing.gif" alt="Birthday Sticker">
+    <div id="message-container">
+        <p id="message-text"></p>
+        <div id="next-button-container">
+            <button id="next-button" onclick="goToThird()">Next</button>
+        </div>
+    </div>
+
+    
+    <audio id="song" src="audios/happy-birthday-to-you.mp3" autoplay loop></audio>
+
+    <div id="mute-button-container">
+        <button id="mute-button">
+        <img id="mute-icon" src="imgs/speaker-icon.png" alt="Mute/Unmute">
+        </button>
+    </div>
+    
+    <div id="next-button-container">
+        <button id="next-button">Next</button>
+    </div>
+ 
+    <script>
+        function goToThird(){
+            window.location.href = "third.html";
+        }
+        const sticker = document.getElementById("sticker");
+        const messageContainer = document.getElementById("message-container");
+        const messageText = document.getElementById("message-text");
+        const song = document.getElementById("song");
+        const muteButton = document.getElementById("mute-button");
+        const muteIcon = document.getElementById("mute-icon");
+        const nextButtonContainer = document.getElementById("next-button-container");
+    
+        /* The full message to be typed */
+        const message = `
+            <span style="font-size: 2.5vw; font-weight: bold;">
+            🎉 Happy Birthday to the most special person! 🎂
+            </span><br><br>
+            Repeating from what I said last year, I'm grateful to be able to celebrate your 18th, 19th, 20th, 21st, 22nd and now 23rd birthday - the only difference being that I love you more on your 23rd than I did on your 22nd, I loved you more on your 22nd than I did on your 21st and so on.<br><br>
+            I love you a lot and am extremely thankful to have you in my life. You, undoubtedly, light my mood up always and gently guide my day (and therefore me) towards a brighter, more hopeful place, every time we call or even text.<br><br>
+            I hope today and every other day goes amazing for you and that you get everything you wish for. Not just things enough to survive but the things that you love and excite you. I really wanna see you less struggling and more doing the things that you love.
+            `;
+
+        let i = 0;
+        const typingSpeed = 50; // Milliseconds per character
+    
+        function typeWriter() {
+            if (i < message.length) {
+                // If next char starts an HTML tag, skip till '>'
+                if (message[i] === "<") {
+                    const closingIndex = message.indexOf(">", i);
+                    messageText.innerHTML += message.substring(i, closingIndex + 1);
+                    i = closingIndex + 1;
+                } else {
+                    messageText.innerHTML += message[i];
+                    i++;
+                }
+                setTimeout(typeWriter, typingSpeed);
+            } else {
+                messageText.style.borderRight = "none";
+                // Call the function to show the next button after a delay
+                setTimeout(() => {
+                    nextButtonContainer.style.opacity = "1";
+                }, 5000); // 5 seconds delay
+            }
+        }
+
+        // After 10 seconds: fade sticker + start typewriter animation
+        setTimeout(() => {
+            sticker.style.opacity = "0.2";
+            messageContainer.style.opacity = "1";
+            typeWriter(); /*Start the new typing function*/
+        }, 10000);
+
+        // Toggle mute and icon
+        muteButton.addEventListener('click', () => {
+            if (song.muted) {
+                song.muted = false;
+                muteIcon.src = 'imgs/speaker-icon.png';
+            } else {
+                song.muted = true;
+                muteIcon.src = 'imgs/mute-icon.png';
+            }
+        });
+    </script>
+</body>
+</html>

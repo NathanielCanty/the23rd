@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Sky on a Special Day</title>
+    <link href="https://fonts.googleapis.com/css?family=Anonymous+Pro|Press+Start+2P" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; 
+            font-family: 'Anonymous Pro', monospace;
+            color: rgba(255,255,255,.75);
+            text-align: center;
+        }
+        #stellarium-iframe-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        #stellarium-iframe {
+            width: 200%; 
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            position: absolute;
+            border: none;
+        }
+        #content {
+            position: relative;
+            z-index: 1; 
+            padding-top: 20px; 
+            padding-left: 20px; 
+            padding-right: 20px; 
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            justify-content: space-between;
+        }
+        #text-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+        h1, h3 {
+            font-family: 'Press Start 2P', cursive;
+            color: #fff;
+            -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.5); 
+            text-stroke: 0.5px rgba(255, 255, 255, 0.5);
+            text-shadow: 
+                0 0 1px #00e5ff,
+                0 0 1px #00e5ff,
+                0 0 1px #00e5ff,
+                0 0 2px #00e5ff,
+                0 0 2px #00e5ff,
+                0 0 9px #00e5ff;
+        }
+        h1 {
+            font-size: 1.5em; 
+            margin: 0;
+        }
+        h3 {
+            font-size: 1em; 
+        }
+        p {
+            font-size: 1.1em; 
+            font-weight: bold; 
+            margin: 10px 0;
+            line-height: 1.5em; 
+        }
+        .button-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 23px;
+            padding-bottom: 50px;
+        }
+        .btn {
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+            padding: 25px 30px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+        /* Mute Button Styles */
+        #mute-button-container {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            z-index: 2; /* Ensure it's above other content but not the main text */
+        }
+        #mute-button {
+            width: 50px; /* Slightly larger button */
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #mute-icon {
+            width: 25px; /* Slightly larger icon */
+            height: 25px;
+        }
+
+        /* Back Button Styling */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid white;
+            border-radius: 50%;
+            text-decoration: none;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s, color 0.3s;
+            z-index: 1001;
+        }
+
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <audio id="background-audio" src="audios/space-bg.mp3" autoplay loop></audio>
+    <div id="stellarium-iframe-container">
+        <iframe id="stellarium-iframe" 
+                src="https://stellarium-web.org/?date=2002-09-24&time=12:00:00&lat=-33.8688&lon=151.2093"></iframe>
+    </div>
+    <div id="content">
+        <a href="javascript:history.back()" class="back-btn">&#8592;</a>
+        <div id="dynamic-content">
+            <div id="text-content">
+                <h1>The Sky on September 24, 2002.</h1>
+                <h3>In Queensland, Australia</h3>
+                <p>This is a live simulation of how the sky looked like in the midnight of the day you were born :))</p>
+            </div>
+        </div>
+        <div class="button-container">
+            <button id="btn1" class="btn" onclick="window.location.href = 'pages/page1.html'">Get My Jar!</button>
+            <button id="btn2" class="btn" onclick="window.location.href = 'pages/page2.html'">Certificate</button>
+        </div>
+    </div>
+    <div id="mute-button-container">
+        <button id="mute-button">
+            <img id="mute-icon" src="imgs/speaker-icon.png" alt="Mute/Unmute">
+        </button>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dynamicContent = document.getElementById('dynamic-content');
+            const buttonContainer = document.querySelector('.button-container');
+            const audio = document.getElementById('background-audio');
+            const muteButton = document.getElementById('mute-button');
+            const muteIcon = document.getElementById('mute-icon');
+
+            // Function to update the mute icon based on audio state
+            function updateMuteIcon() {
+                if (audio.muted || audio.paused || audio.ended) {
+                    muteIcon.src = "imgs/mute-icon.png";
+                } else {
+                    muteIcon.src = "imgs/speaker-icon.png";
+                }
+            }
+
+            // Handle the initial state and refresh
+            function handlePageLoad() {
+                audio.muted = false;
+                audio.play().then(() => {
+                    // This block runs if autoplay is successful
+                    updateMuteIcon();
+                }).catch(error => {
+                    // This block runs if autoplay is blocked (most common)
+                    console.log("Autoplay was prevented. User interaction is required to start the audio.");
+                    audio.muted = true; // Keep it muted until a user gesture
+                    updateMuteIcon();
+                });
+            }
+
+            // Start the process on page load
+            window.addEventListener('load', handlePageLoad);
+            // This also helps with "Back" button navigation on some browsers
+            window.addEventListener('pageshow', (event) => {
+                if (event.persisted) {
+                    handlePageLoad();
+                }
+            });
+
+            // Add a single-use event listener for the first user interaction
+            document.body.addEventListener('click', () => {
+                if (audio.muted) {
+                    audio.muted = false;
+                    audio.play();
+                    updateMuteIcon();
+                }
+            }, { once: true }); // The { once: true } ensures this listener is removed after one use
+
+            // Mute/Unmute functionality
+            muteButton.addEventListener('click', () => {
+                if (audio.muted) {
+                    audio.muted = false;
+                    audio.play(); // Attempt to play if it was paused
+                } else {
+                    audio.muted = true;
+                }
+                updateMuteIcon();
+            });
+
+            // Page navigation functionality
+            buttonContainer.addEventListener('click', async (event) => {
+                const target = event.target;
+                if (target.matches('.btn')) {
+                    event.preventDefault();
+                    const url = target.getAttribute('href');
+
+                    if (url) {
+                        try {
+                            const response = await fetch(url);
+                            const html = await response.text();
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            const newContent = doc.getElementById('dynamic-content');
+
+                            if (newContent) {
+                                dynamicContent.innerHTML = newContent.innerHTML;
+                                history.pushState({}, '', url);
+                            }
+                        } catch (error) {
+                            console.error('Failed to load content:', error);
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Image</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* General body styling */
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin-top: 0;
+            background-color: #f5f5f5; /* Lighter background */
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjY2NjIi8+Cjwvc3ZnPg=='); /* Subtle pattern */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font */
+            transition: background-color 0.5s;
+        }
+
+        /* Image container styling */
+        .image-container {
+            width: 80%; /* Adjusted width for more space */
+            max-width: 600px;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: 10px; /* Softer corners */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* Deeper shadow */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            margin: 20px; /* Adds margin around the container */
+        }
+
+        .image-container:hover {
+            transform: scale(1.05); /* Softer pop out effect */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+        }
+
+        #main-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Fullscreen overlay styling */
+        #fullscreen-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95); /* Slightly darker overlay */
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            animation: fadeIn 0.3s forwards; /* Added fade-in animation */
+        }
+
+        #fullscreen-image {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px; /* Consistent corner radius */
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 50px; /* Larger close button */
+            color: #ffffff;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #ff4d4d; /* Red color on hover */
+        }
+
+        /* Download button styling */
+        .download-btn {
+            margin-top: 25px;
+            padding: 12px 25px; /* Larger padding */
+            background-color: #008cba; /* A more professional blue */
+            color: white;
+            border: none;
+            border-radius: 30px; /* Pill shape */
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        #click {
+            margin-top: 25px;
+            padding: 12px 25px; /* Larger padding */
+            background-color: #4533ac; /* A more professional blue */
+            color: white;
+            border: none;
+            border-radius: 30px; /* Pill shape */
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .download-btn:hover {
+            background-color: #0076a0;
+            transform: translateY(-2px); /* Lift effect on hover */
+        }
+        
+        .download-icon {
+            width: 22px;
+            height: 22px;
+            margin-left: 12px;
+            filter: invert(1);
+        }
+
+        /* Back Button Styling */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 15px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border-radius: 50%;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            z-index: 1001;
+        }
+        .back-btn:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Keyframes for animation */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <a href="javascript:history.back()" class="back-btn">&#8592;</a>
+    <div class="image-container">
+        <img id="main-image" src="../imgs/Certificate.png" alt="Your Certificate">
+    </div>
+
+    <div id="click">
+        Click the certificate :D !
+    </div>
+
+    <div id="fullscreen-overlay">
+        <span class="close-btn">&times;</span>
+        <img id="fullscreen-image" src="../imgs/Certificate.png" alt="Fullscreen Certificate">
+        <button id="download-btn-overlay" class="download-btn">
+            Download Certificate
+            <img src="../imgs/download-icon.png" alt="Download Icon" class="download-icon">
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainImage = document.getElementById('main-image');
+            const fullscreenOverlay = document.getElementById('fullscreen-overlay');
+            const closeBtn = document.querySelector('.close-btn');
+            const fullscreenImage = document.getElementById('fullscreen-image');
+            const downloadBtnMain = document.getElementById('download-btn-main');
+            const downloadBtnOverlay = document.getElementById('download-btn-overlay');
+
+            // Function to handle the download logic
+            const handleDownload = async () => {
+                try {
+                    const response = await fetch(fullscreenImage.src);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const imageBlob = await response.blob();
+                    
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(imageBlob);
+                    link.download = 'certificate.png'; // Changed to .png as it's an image
+                    
+                    document.body.appendChild(link);
+                    link.click();
+                    
+                    URL.revokeObjectURL(link.href);
+                    document.body.removeChild(link);
+                    
+                    alert('Certificate has been downloaded!');
+
+                } catch (error) {
+                    console.error('Download failed:', error);
+                    alert('Failed to download the certificate.');
+                }
+            };
+            
+            // Open fullscreen view on image click
+            mainImage.addEventListener('click', () => {
+                fullscreenOverlay.style.display = 'flex';
+            });
+
+            // Close fullscreen view on cross sign click
+            closeBtn.addEventListener('click', () => {
+                fullscreenOverlay.style.display = 'none';
+            });
+
+            // Handle the download button clicks
+            downloadBtnMain.addEventListener('click', handleDownload);
+            downloadBtnOverlay.addEventListener('click', handleDownload);
+        });
+    </script>
+</body>
+</html>
